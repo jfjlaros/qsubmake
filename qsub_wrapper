@@ -1,20 +1,23 @@
 #!/bin/bash
 
-# Logging.
+# Configuration.
 LOG_PATH="qsub_logs"
 
+# Make the logging directory if it does not exist yet.
 mkdir -p $LOG_PATH
 
-# Job deployment.
+# Extract the SGE_RREQ variable if present.
 CMD=$2
 if $(echo $2 | grep "^SGE_RREQ="  > /dev/null); then
-  SGE_RREQ=$(echo $2 | cut -b 11- | sed 's/" .*//')
-  CMD=$(echo $2 | sed 's/.* "//')
+  SGE_RREQ=$(echo $2 | sed 's/^[^"]*"\([^"]*\)" .*/\1/')
+  CMD=$(echo $2 | sed 's/^[^"]*"[^"]*" //')
 fi
 
+# Deploy the job.
 cat << EOF | qsub -sync y -cwd -o $LOG_PATH -e $LOG_PATH $SGE_RREQ -- -
 #!/bin/sh
 echo Job started at \`date\`
+echo Job \$JOB_NAME (\$JOB_ID) in queue \$QUEUE running on \$HOSTNAME
 $CMD
 echo Job finished at \`date\`
 EOF
