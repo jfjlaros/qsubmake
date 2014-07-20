@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Logging.
+LOG_PATH="qsub_logs"
+
+mkdir -p $LOG_PATH
+
+# Job deployment.
+CMD=$2
+if $(echo $2 | grep "^SGE_RREQ="  > /dev/null); then
+  SGE_RREQ=$(echo $2 | cut -b 11- | sed 's/" .*//')
+  CMD=$(echo $2 | sed 's/.* "//')
+fi
+
+cat << EOF | qsub -sync y -cwd -o $LOG_PATH -e $LOG_PATH $SGE_RREQ -- -
+#!/bin/sh
+echo Job started at \`date\`
+$CMD
+echo Job finished at \`date\`
+EOF
