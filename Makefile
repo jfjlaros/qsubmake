@@ -1,7 +1,5 @@
 # Makefile.
 
-SHELL := ./qsub_wrapper
-
 all: combined.out
 
 %.out: %.in
