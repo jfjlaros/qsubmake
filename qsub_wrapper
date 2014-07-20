@@ -22,6 +22,14 @@ echo ID: \$JOB_ID
 echo Queue: \$QUEUE
 echo Host: \$HOSTNAME
 echo User: \$LOGNAME
+echo SGE_RREQ: \""$SGE_RREQ"\"
+echo Command:
+echo ---
+echo "$CMD"
+echo ---
+echo Output:
+echo ---
 $CMD
+echo ---
 echo End: \`date\`
 EOF
