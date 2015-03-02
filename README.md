@@ -8,4 +8,4 @@ You can use a normal `Makefile`, just override the `SHELL` variable.
 
 To run a pipeline:
 
-    nohup make "SHELL=./qsub_wrapper" -j 100 >> log.txt 2> /dev/null &
+    nohup make "SHELL=./qsub_wrapper" -j 100 >> log.txt 2>> log_err.txt &

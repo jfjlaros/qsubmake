@@ -13,8 +13,11 @@ if $(echo $2 | grep "^SGE_RREQ="  > /dev/null); then
   CMD=$(echo $2 | sed 's/^[^"]*"[^"]*" //')
 fi
 
+# Choose an output file.
+OUTPUT=".$(date +%s)_$RANDOM"
+
 # Deploy the job.
-cat << EOF | qsub -sync y -cwd -o $LOG_PATH -e $LOG_PATH $SGE_RREQ -- -
+cat << EOF | qsub -sync y -cwd -o $LOG_PATH -e $LOG_PATH $SGE_RREQ -- - 1>&2
 #!/bin/sh
 echo Start: \`date\`
 echo Name: \$JOB_NAME
@@ -29,7 +32,12 @@ echo "$CMD"
 echo ---
 echo Output:
 echo ---
-$CMD
+$CMD > $OUTPUT
+echo 
 echo ---
 echo End: \`date\`
 EOF
+
+# Return the output (if any) and clean up.
+cat $OUTPUT
+rm $OUTPUT
