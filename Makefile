@@ -12,3 +12,6 @@ all: combined.out
 combined.out: $(OUT)
 	cat $^ > $@ ;\
 	echo test
+
+clean:
+	rm -rf *.out *.txt qsub_logs

@@ -16,10 +16,19 @@ fi
 # Choose an output file.
 OUTPUT=".$(date +%s)_$RANDOM"
 
+NAME="$(echo $CMD | sed 's/ .*//;s/.*\///')"
+
 # Deploy the job.
-cat << EOF | qsub -sync y -cwd -o $LOG_PATH -e $LOG_PATH $SGE_RREQ -- - 1>&2
+cat << EOF | qsub \
+  -sync y \
+  -cwd \
+  -o $LOG_PATH \
+  -e $LOG_PATH \
+  -N $NAME \
+  $SGE_RREQ \
+  -- - 1>&2
 #!/bin/sh
-echo Start: \`date\`
+echo Start: \$(date)
 echo Name: \$JOB_NAME
 echo ID: \$JOB_ID
 echo Queue: \$QUEUE
@@ -32,10 +41,10 @@ echo "$CMD"
 echo ---
 echo Output:
 echo ---
-$CMD > $OUTPUT
-echo 
+($CMD) > $OUTPUT
+cat $OUTPUT
 echo ---
-echo End: \`date\`
+echo End: \$(date)
 EOF
 
 # Return the output (if any) and clean up.
