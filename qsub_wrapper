@@ -28,25 +28,40 @@ cat << EOF | qsub \
   $SGE_RREQ \
   -- - 1>&2
 #!/bin/sh
-echo Start: \$(date)
-echo Name: \$JOB_NAME
-echo ID: \$JOB_ID
-echo Queue: \$QUEUE
-echo Host: \$HOSTNAME
-echo User: \$LOGNAME
-echo SGE_RREQ: \""$SGE_RREQ"\"
-echo Command:
-echo ---
-echo "$CMD"
-echo ---
-echo Output:
-echo ---
-($CMD) > $OUTPUT
+
+(
+  set -e
+  $CMD
+) > $OUTPUT
+ERRORCODE=\$?
 cat $OUTPUT
-echo ---
-echo End: \$(date)
+
+cat << EOFF > $LOG_PATH/\$JOB_NAME.l\$JOB_ID
+Start: \$(date)
+Name: \$JOB_NAME
+ID: \$JOB_ID
+Queue: \$QUEUE
+Host: \$HOSTNAME
+User: \$LOGNAME
+SGE_RREQ: \""$SGE_RREQ"\"
+Command:
+---
+"$CMD"
+---
+Output:
+---
+\$(cat $OUTPUT)
+---
+Error: \$ERRORCODE
+End: \$(date)
+EOFF
+
+exit \$ERRORCODE
 EOF
+ERRORCODE=$?
 
 # Return the output (if any) and clean up.
 cat $OUTPUT
 rm $OUTPUT
+
+exit $ERRORCODE
